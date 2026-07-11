@@ -1,7 +1,7 @@
 /**
  * ResultsView — full research results display.
- * Per PRD §5: verdict badge, confidence meter, reasoning list,
- * per-signal breakdown (expandable cards).
+ * Styled with the Stitch "Field Ledger" aesthetic:
+ * serif headings, white cards, muted academic tones.
  */
 
 import VerdictBadge from './VerdictBadge';
@@ -17,30 +17,30 @@ export default function ResultsView({ result, onNewSearch }) {
   return (
     <div id="results-view" className="w-full max-w-3xl mx-auto space-y-8 animate-fade-in">
       {/* Header */}
-      <div className="text-center space-y-2">
-        <h2 className="text-2xl font-bold text-white">
+      <div className="text-left space-y-1">
+        <h2 className="font-serif text-display-lg text-primary">
           Research Report
         </h2>
-        <p className="text-lg gradient-text font-semibold">{companyName}</p>
+        <p className="text-body-lg text-secondary font-medium italic">{companyName}</p>
       </div>
 
       {/* Verdict */}
       {finalVerdict && (
-        <div className="flex justify-center">
+        <div className="ledger-card p-10 flex justify-center">
           <VerdictBadge verdict={finalVerdict} />
         </div>
       )}
 
       {/* Reasoning */}
       {finalVerdict && finalVerdict.reasoning && finalVerdict.reasoning.length > 0 && (
-        <div className="glass-card p-6 animate-slide-up" style={{ animationDelay: '200ms' }}>
-          <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
+        <div className="ledger-card p-8 animate-slide-up" style={{ animationDelay: '200ms' }}>
+          <h3 className="label-caps mb-4">
             Key Reasoning
           </h3>
-          <ul className="space-y-2">
+          <ul className="space-y-3">
             {finalVerdict.reasoning.map((reason, i) => (
-              <li key={i} className="flex items-start gap-3 text-sm text-gray-200">
-                <span className="mt-0.5 text-brand-400 font-bold text-xs">{i + 1}.</span>
+              <li key={i} className="flex items-start gap-3 text-body-md text-[#1B1C1B]">
+                <span className="mt-0.5 text-secondary font-bold text-mono-data">{i + 1}.</span>
                 {reason}
               </li>
             ))}
@@ -50,14 +50,15 @@ export default function ResultsView({ result, onNewSearch }) {
 
       {/* Risks */}
       {finalVerdict && finalVerdict.risks && finalVerdict.risks.length > 0 && (
-        <div className="glass-card p-6 border-pass/10 animate-slide-up" style={{ animationDelay: '300ms' }}>
-          <h3 className="text-sm font-semibold text-pass/80 uppercase tracking-wider mb-3">
-            ⚠️ Key Risks
+        <div className="ledger-card p-8 border-pass/20 animate-slide-up" style={{ animationDelay: '300ms' }}>
+          <h3 className="label-caps text-pass mb-4 flex items-center gap-2">
+            <span className="material-symbols-outlined text-[16px]">warning</span>
+            Key Risks
           </h3>
-          <ul className="space-y-2">
+          <ul className="space-y-3">
             {finalVerdict.risks.map((risk, i) => (
-              <li key={i} className="flex items-start gap-3 text-sm text-gray-300">
-                <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-pass flex-shrink-0" />
+              <li key={i} className="flex items-start gap-3 text-body-md text-[#424846]">
+                <span className="mt-2 w-1.5 h-1.5 rounded-full bg-pass flex-shrink-0" />
                 {risk}
               </li>
             ))}
@@ -67,7 +68,7 @@ export default function ResultsView({ result, onNewSearch }) {
 
       {/* Signal Breakdown */}
       <div className="space-y-3">
-        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider px-1">
+        <h3 className="label-caps px-1">
           Signal Breakdown
         </h3>
         {signals.map((signal, i) => (
@@ -77,26 +78,28 @@ export default function ResultsView({ result, onNewSearch }) {
 
       {/* Errors */}
       {errors && errors.length > 0 && (
-        <div className="glass-card p-4 border-watch/20 animate-slide-up">
-          <h3 className="text-xs font-semibold text-watch uppercase tracking-wider mb-2">
+        <div className="ledger-card p-6 border-watch/30 animate-slide-up">
+          <h3 className="label-caps text-watch mb-3 flex items-center gap-2">
+            <span className="material-symbols-outlined text-[16px]">info</span>
             Data Collection Issues
           </h3>
           <ul className="space-y-1">
             {errors.map((error, i) => (
-              <li key={i} className="text-xs text-gray-400">• {error}</li>
+              <li key={i} className="text-body-md text-[#424846]">• {error}</li>
             ))}
           </ul>
         </div>
       )}
 
       {/* New Search Button */}
-      <div className="flex justify-center pt-2">
+      <div className="flex justify-center pt-4">
         <button
           id="new-search"
           onClick={onNewSearch}
-          className="px-6 py-2.5 text-sm font-medium text-brand-400 border border-brand-500/30 rounded-xl hover:bg-brand-500/10 transition-all duration-200"
+          className="flex items-center gap-2 px-6 py-3 label-caps text-secondary border border-secondary/30 hover:bg-secondary/5 transition-all"
         >
-          ← Research Another Company
+          <span className="material-symbols-outlined text-[18px]">arrow_back</span>
+          Research Another Company
         </button>
       </div>
     </div>

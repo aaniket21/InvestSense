@@ -4,62 +4,102 @@
 
 @layer base {
   body {
-    @apply bg-surface-900 text-gray-100 font-sans antialiased;
+    background-color: #EDF1EA;
+    color: #1B1C1B;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: 14px;
+    line-height: 22px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   ::selection {
-    @apply bg-brand-500/30 text-white;
+    background-color: rgba(76, 122, 94, 0.2);
+    color: #1F2E2B;
   }
 
   ::-webkit-scrollbar {
     width: 6px;
   }
   ::-webkit-scrollbar-track {
-    @apply bg-surface-800;
+    background-color: #EDF1EA;
   }
   ::-webkit-scrollbar-thumb {
-    @apply bg-surface-500 rounded-full;
+    background-color: #C2C8C5;
+    border-radius: 9999px;
   }
 }
 
 @layer components {
-  .glass-card {
-    @apply bg-surface-700/50 backdrop-blur-xl border border-white/5 rounded-2xl;
+  .ledger-card {
+    background-color: #ffffff;
+    border: 1px solid #D4D9CC;
+    transition: all 0.2s;
   }
 
-  .glass-card-hover {
-    @apply glass-card transition-all duration-300 hover:border-white/10 hover:bg-surface-700/70 hover:shadow-lg hover:shadow-brand-500/5;
+  .ledger-card-hover {
+    background-color: #ffffff;
+    border: 1px solid #D4D9CC;
+    transition: all 0.2s;
   }
 
-  .gradient-text {
-    @apply bg-gradient-to-r from-brand-400 to-brand-200 bg-clip-text text-transparent;
+  .ledger-card-hover:hover {
+    border-color: #424846;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  }
+
+  .label-caps {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 12px;
+    line-height: 16px;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #424846;
+  }
+
+  .headline-serif {
+    font-family: 'Fraunces', Georgia, serif;
+    color: #1F2E2B;
   }
 
   .shimmer-bg {
-    @apply bg-gradient-to-r from-surface-700 via-surface-600 to-surface-700 bg-[length:200%_100%] animate-shimmer;
+    background: linear-gradient(90deg, #EFEDEC 0%, #C2C8C5 50%, #EFEDEC 100%);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
   }
 
   .verdict-invest {
-    @apply bg-invest/10 text-invest border-invest/30;
+    background-color: rgba(45, 106, 79, 0.1);
+    color: #2D6A4F;
+    border-color: rgba(45, 106, 79, 0.3);
   }
 
   .verdict-pass {
-    @apply bg-pass/10 text-pass border-pass/30;
+    background-color: rgba(155, 44, 44, 0.1);
+    color: #9B2C2C;
+    border-color: rgba(155, 44, 44, 0.3);
   }
 
   .verdict-watch {
-    @apply bg-watch/10 text-watch border-watch/30;
+    background-color: rgba(183, 121, 31, 0.1);
+    color: #B7791F;
+    border-color: rgba(183, 121, 31, 0.3);
   }
 
   .signal-positive {
-    @apply text-invest;
+    color: #2D6A4F;
   }
 
   .signal-neutral {
-    @apply text-gray-400;
+    color: #424846;
   }
 
   .signal-negative {
-    @apply text-pass;
+    color: #9B2C2C;
+  }
+
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
   }
 }

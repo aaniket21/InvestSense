@@ -20,7 +20,7 @@ const INITIAL_DELAY_MS = 2000;
  *
  * @param {object} [options] - Configuration options
  * @param {string} [options.apiKey] - Google API key (defaults to env var)
- * @param {string} [options.model] - Model name (defaults to gemini-2.0-flash)
+ * @param {string} [options.model] - Model name (defaults to gemini-3.5-flash)
  * @param {number} [options.temperature] - Temperature for generation (defaults to 0.3)
  * @returns {ChatGoogleGenerativeAI} Configured LLM instance
  */
@@ -33,7 +33,7 @@ function createLlm(options = {}) {
 
   return new ChatGoogleGenerativeAI({
     apiKey,
-    model: options.model || 'gemini-2.0-flash',
+    model: options.model || 'gemini-3.5-flash',
     temperature: options.temperature ?? 0.3,
   });
 }

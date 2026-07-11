@@ -1,18 +1,16 @@
 /**
  * LoadingState — animated loading display shown during research.
- * Per PRD §5: show progress per signal being researched.
- * Since we can't stream individual node progress from the backend,
- * we simulate the stages with timed animations.
+ * Styled with the Stitch "Field Ledger" aesthetic.
  */
 
 import { useState, useEffect } from 'react';
 
 const RESEARCH_STAGES = [
-  { label: 'Fetching financial data…', icon: '📊' },
-  { label: 'Scanning recent news…', icon: '📰' },
-  { label: 'Analyzing competitive position…', icon: '🏆' },
-  { label: 'Reviewing management signals…', icon: '👔' },
-  { label: 'Synthesizing investment verdict…', icon: '🧠' },
+  { label: 'Fetching financial data…', icon: 'monitoring' },
+  { label: 'Scanning recent news…', icon: 'newspaper' },
+  { label: 'Analyzing competitive position…', icon: 'emoji_events' },
+  { label: 'Reviewing management signals…', icon: 'business_center' },
+  { label: 'Synthesizing investment verdict…', icon: 'psychology' },
 ];
 
 export default function LoadingState() {
@@ -31,13 +29,13 @@ export default function LoadingState() {
 
   return (
     <div id="loading-state" className="w-full max-w-2xl mx-auto animate-fade-in">
-      <div className="glass-card p-8">
+      <div className="ledger-card p-8">
         <div className="flex items-center gap-3 mb-6">
-          <div className="h-2 w-2 bg-brand-500 rounded-full animate-pulse" />
-          <h2 className="text-lg font-semibold text-white">Research in Progress</h2>
+          <div className="h-2 w-2 bg-secondary rounded-full animate-pulse" />
+          <h2 className="font-serif text-headline-sm text-primary">Research in Progress</h2>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-2">
           {RESEARCH_STAGES.map((stage, index) => {
             const isActive = index === activeStage;
             const isComplete = index < activeStage;
@@ -46,19 +44,21 @@ export default function LoadingState() {
             return (
               <div
                 key={stage.label}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-500 ${
+                className={`flex items-center gap-3 px-4 py-3 transition-all duration-500 ${
                   isActive
-                    ? 'bg-brand-500/10 border border-brand-500/20'
+                    ? 'bg-secondary/5 border border-secondary/20'
                     : isComplete
                     ? 'bg-invest/5 border border-transparent'
                     : 'border border-transparent opacity-40'
                 }`}
               >
-                <span className="text-xl w-8 text-center">
-                  {isComplete ? '✅' : stage.icon}
+                <span className={`material-symbols-outlined text-xl ${
+                  isComplete ? 'text-invest' : isActive ? 'text-secondary' : 'text-[#424846]'
+                }`}>
+                  {isComplete ? 'check_circle' : stage.icon}
                 </span>
-                <span className={`text-sm font-medium ${
-                  isActive ? 'text-brand-300' : isComplete ? 'text-invest' : 'text-gray-500'
+                <span className={`text-body-md font-medium ${
+                  isActive ? 'text-secondary' : isComplete ? 'text-invest' : 'text-[#424846]'
                 }`}>
                   {stage.label}
                 </span>
@@ -72,7 +72,7 @@ export default function LoadingState() {
           })}
         </div>
 
-        <p className="mt-6 text-xs text-gray-500 text-center">
+        <p className="mt-6 text-body-md text-[#424846] opacity-60 text-center">
           This typically takes 15–30 seconds due to multiple AI analysis steps.
         </p>
       </div>
