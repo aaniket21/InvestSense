@@ -41,14 +41,14 @@ function App() {
       {/* Header Navigation */}
       <header className="w-full px-gutter max-w-[1120px] mx-auto h-16 flex justify-between items-center border-b border-[#C2C8C5]">
         <div className="flex items-center gap-4">
-          <span className="material-symbols-outlined text-primary text-2xl">menu</span>
+          {/* <span className="material-symbols-outlined text-primary text-2xl">menu</span> */}
           <h1 className="font-serif text-headline-md font-medium text-primary">InvestSense</h1>
         </div>
-        <nav className="hidden md:flex items-center gap-8">
+        {/* <nav className="hidden md:flex items-center gap-8">
           <a href="#" className="label-caps font-bold text-primary">Research</a>
           <a href="#" className="label-caps text-[#424846] hover:text-primary transition-colors">Watchlist</a>
           <a href="#" className="label-caps text-[#424846] hover:text-primary transition-colors">Portfolio</a>
-        </nav>
+        </nav> */}
       </header>
 
       {/* Main Content */}
