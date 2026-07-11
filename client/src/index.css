@@ -1,3 +1,65 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-surface-900 text-gray-100 font-sans antialiased;
+  }
+
+  ::selection {
+    @apply bg-brand-500/30 text-white;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-surface-800;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-surface-500 rounded-full;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-surface-700/50 backdrop-blur-xl border border-white/5 rounded-2xl;
+  }
+
+  .glass-card-hover {
+    @apply glass-card transition-all duration-300 hover:border-white/10 hover:bg-surface-700/70 hover:shadow-lg hover:shadow-brand-500/5;
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-brand-400 to-brand-200 bg-clip-text text-transparent;
+  }
+
+  .shimmer-bg {
+    @apply bg-gradient-to-r from-surface-700 via-surface-600 to-surface-700 bg-[length:200%_100%] animate-shimmer;
+  }
+
+  .verdict-invest {
+    @apply bg-invest/10 text-invest border-invest/30;
+  }
+
+  .verdict-pass {
+    @apply bg-pass/10 text-pass border-pass/30;
+  }
+
+  .verdict-watch {
+    @apply bg-watch/10 text-watch border-watch/30;
+  }
+
+  .signal-positive {
+    @apply text-invest;
+  }
+
+  .signal-neutral {
+    @apply text-gray-400;
+  }
+
+  .signal-negative {
+    @apply text-pass;
+  }
+}
