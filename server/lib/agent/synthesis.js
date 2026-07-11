@@ -86,6 +86,7 @@ function buildSynthesisPrompt(companyName, signals, errors) {
   lines.push('## Your Task');
   lines.push('');
   lines.push('Based on ALL available signals above, provide your investment verdict:');
+  lines.push('- companyProfile: 1-2 sentences summarizing what the company is and what it does based on the context');
   lines.push('- decision: "Invest" (strong buy signal), "Pass" (avoid), or "Watch" (mixed/insufficient signals)');
   lines.push('- confidence: 0-100 score reflecting how certain you are');
   lines.push('- reasoning: 3-5 bullet points explaining your decision, each tied to specific evidence from the signals');

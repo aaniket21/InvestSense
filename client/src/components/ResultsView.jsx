@@ -13,15 +13,21 @@ export default function ResultsView({ result, onNewSearch }) {
   const { companyName, finalVerdict, financialSummary, newsSummary, competitionSummary, managementSummary, errors } = result;
 
   const signals = [financialSummary, newsSummary, competitionSummary, managementSummary].filter(Boolean);
+  const companyProfile = finalVerdict?.companyProfile;
 
   return (
     <div id="results-view" className="w-full max-w-3xl mx-auto space-y-8 animate-fade-in">
       {/* Header */}
-      <div className="text-left space-y-1">
+      <div className="text-left space-y-2">
         <h2 className="font-serif text-display-lg text-primary">
           Research Report
         </h2>
         <p className="text-body-lg text-secondary font-medium italic">{companyName}</p>
+        {companyProfile && (
+          <p className="text-body-md text-[#424846] mt-2 border-l-2 border-secondary/30 pl-4 py-1 italic opacity-80">
+            {companyProfile}
+          </p>
+        )}
       </div>
 
       {/* Verdict */}

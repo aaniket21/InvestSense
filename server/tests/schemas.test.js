@@ -27,6 +27,7 @@ describe('SignalResultSchema', () => {
 
   it('accepts all three verdict values', () => {
     const base = {
+      companyProfile: 'Profile',
       signalName: 'Test',
       summary: 'Test summary',
       evidence: ['evidence'],
@@ -68,11 +69,13 @@ describe('FinalVerdictSchema', () => {
     const valid = {
       decision: 'Invest',
       confidence: 85,
+      companyProfile: 'A major technology company',
       reasoning: ['Strong revenue growth', 'Positive news sentiment'],
       risks: ['High valuation', 'Regulatory uncertainty'],
     };
     const result = FinalVerdictSchema.parse(valid);
     expect(result.decision).toBe('Invest');
+    expect(result.companyProfile).toBe('A major technology company');
     expect(result.confidence).toBe(85);
     expect(result.reasoning).toHaveLength(2);
     expect(result.risks).toHaveLength(2);
@@ -80,6 +83,7 @@ describe('FinalVerdictSchema', () => {
 
   it('accepts all three decision values', () => {
     const base = {
+      companyProfile: 'Profile',
       confidence: 50,
       reasoning: ['reason'],
       risks: ['risk'],

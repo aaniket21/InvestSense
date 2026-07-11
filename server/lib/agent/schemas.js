@@ -26,6 +26,7 @@ const SignalResultSchema = z.object({
  * Combines all 4 signal results into an investment decision.
  */
 const FinalVerdictSchema = z.object({
+  companyProfile: z.string().describe('A 1-2 sentence profile of what the company is and what it does'),
   decision: z.enum(['Invest', 'Pass', 'Watch']),
   confidence: z.number().int().min(0).max(100),
   reasoning: z.array(z.string()),
