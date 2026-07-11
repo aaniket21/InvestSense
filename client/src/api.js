@@ -3,7 +3,7 @@
  * Communicates with the Express server's /api/research endpoint.
  */
 
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3001';
+const API_BASE = import.meta.env.VITE_API_BASE || '';
 
 /**
  * Sends a research request for a company.

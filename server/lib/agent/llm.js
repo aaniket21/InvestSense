@@ -4,11 +4,16 @@
  * Provides:
  * - createLlm(): factory for ChatGoogleGenerativeAI instance
  * - callLlmWithSchema(): invoke LLM with Zod schema for structured output
+ * - Retry with exponential backoff for rate limit handling
  *
  * Per PRD §6: Uses @langchain/google-genai with Gemini API.
+ * Per PRD §11: Retry-with-backoff for Gemini free tier rate limits.
  */
 
 const { ChatGoogleGenerativeAI } = require('@langchain/google-genai');
+
+const MAX_RETRIES = 3;
+const INITIAL_DELAY_MS = 2000;
 
 /**
  * Creates a ChatGoogleGenerativeAI instance.
@@ -20,7 +25,7 @@ const { ChatGoogleGenerativeAI } = require('@langchain/google-genai');
  * @returns {ChatGoogleGenerativeAI} Configured LLM instance
  */
 function createLlm(options = {}) {
-  const apiKey = options.apiKey || process.env.GOOGLE_API_KEY;
+  const apiKey = options.apiKey || process.env.GOOGLE_API_KEY || process.env.GEMINI_API_KEY;
 
   if (!apiKey) {
     throw new Error('GOOGLE_API_KEY is required');
@@ -34,7 +39,29 @@ function createLlm(options = {}) {
 }
 
 /**
+ * Waits for a specified number of milliseconds.
+ *
+ * @param {number} ms - Milliseconds to wait
+ * @returns {Promise<void>}
+ */
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * Checks if an error is a retryable rate limit error.
+ *
+ * @param {Error} error - Error to check
+ * @returns {boolean} True if the error is a rate limit that should be retried
+ */
+function isRateLimitError(error) {
+  const message = error.message || '';
+  return message.includes('429') || message.includes('quota') || message.includes('rate limit');
+}
+
+/**
  * Invokes the LLM with a Zod schema to get structured output.
+ * Includes retry with exponential backoff for rate limit errors.
  *
  * Uses LangChain's withStructuredOutput to constrain the LLM
  * response to match the provided schema.
@@ -46,8 +73,28 @@ function createLlm(options = {}) {
  */
 async function callLlmWithSchema(llm, schema, prompt) {
   const structuredLlm = llm.withStructuredOutput(schema);
-  const result = await structuredLlm.invoke(prompt);
-  return result;
+
+  let lastError;
+
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      const result = await structuredLlm.invoke(prompt);
+      return result;
+    } catch (error) {
+      lastError = error;
+
+      if (isRateLimitError(error) && attempt < MAX_RETRIES) {
+        const delay = INITIAL_DELAY_MS * Math.pow(2, attempt);
+        console.warn(`Rate limit hit, retrying in ${delay}ms (attempt ${attempt + 1}/${MAX_RETRIES})`);
+        await sleep(delay);
+        continue;
+      }
+
+      throw error;
+    }
+  }
+
+  throw lastError;
 }
 
-module.exports = { createLlm, callLlmWithSchema };
+module.exports = { createLlm, callLlmWithSchema, sleep, isRateLimitError };
