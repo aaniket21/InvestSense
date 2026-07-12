@@ -146,11 +146,12 @@ Using a separate Express server keeps the concerns clean (the agent can be teste
 
 ---
 
-## BONUS: LLM chat session transcripts
+## BONUS: Development notes & example runs
 
-The full history of interactions between the developer and the AI agent (Gemini/Claude) during the creation of InvestSense can be found here:
+I didn't retain a raw export of my AI chat sessions from building this, so 
+rather than presenting a reconstructed transcript as if it were the literal 
+log, the file below is my own account of the process — phase by phase, 
+including where I used AI assistance and the decisions I made along the way.
 
-- [Development Session Logs](docs/chat-logs/development_session.md)
+- [Development Notes](docs/chat-logs/development_notes.md)
 - [Example Runs Outputs](docs/example-runs.md)
-
-These logs highlight the TDD approach taken, starting from a Vite + Express scaffold, building out LangGraph nodes in parallel, addressing API rate limit gracefully, and handling AI hallucinations during the testing phases.
