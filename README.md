@@ -11,6 +11,8 @@ Built for the AI Product Development Engineer assessment at InsideIIM × AltUni 
 
 ## How to run it
 
+🔗 **Live demo:** https://investsense.vercel.app
+
 ### Prerequisites
 - **Node.js** v18+ installed
 - API keys (free tier) for:
