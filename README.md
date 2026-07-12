@@ -1,5 +1,6 @@
 # InvestSense — AI Investment Research Agent
 
+## Overview
 An autonomous AI agent that takes a **company name** as input, researches it across four key dimensions (financial health, news sentiment, competitive position, and management commentary), and produces a clear **Invest / Pass / Watch** decision with evidence-backed reasoning — collapsing hours of manual research into a single structured report.
 
 Built for the AI Product Development Engineer assessment at InsideIIM × AltUni AI Labs.
@@ -8,10 +9,9 @@ Built for the AI Product Development Engineer assessment at InsideIIM × AltUni 
 
 ---
 
-## How to Run It
+## How to run it
 
 ### Prerequisites
-
 - **Node.js** v18+ installed
 - API keys (free tier) for:
   - [Google Gemini](https://aistudio.google.com/) — LLM provider
@@ -19,7 +19,6 @@ Built for the AI Product Development Engineer assessment at InsideIIM × AltUni 
   - [Tavily](https://tavily.com/) — news search
 
 ### Setup
-
 ```bash
 # 1. Clone the repo
 git clone https://github.com/your-username/investsense-agent.git
@@ -29,7 +28,7 @@ cd investsense-agent
 cd server
 npm install
 cp .env.example .env
-# Edit .env and add your API keys
+# Edit .env and add your API keys (GEMINI_API_KEY, ALPHA_VANTAGE_API_KEY, TAVILY_API_KEY)
 
 # 3. Set up the client
 cd ../client
@@ -37,7 +36,6 @@ npm install
 ```
 
 ### Running
-
 ```bash
 # Terminal 1 — Start the API server
 cd server
@@ -49,17 +47,15 @@ cd client
 npm run dev
 # Opens on http://localhost:5173
 ```
-
 Open `http://localhost:5173` in your browser, enter a company name (e.g. "Apple Inc") with its ticker (e.g. "AAPL"), and click **Analyze Company**.
 
 ---
 
-## How It Works
+## How it works
 
 InvestSense uses a **LangGraph.js** directed graph to orchestrate multi-dimensional research. Rather than a simple sequential chain, the graph structure lets signal nodes run in parallel after data is fetched, then converge for synthesis — mirroring how a real analyst processes inputs before forming a judgment.
 
 ### Architecture
-
 ```
 ┌─────────────────┐      ┌──────────────────┐      ┌─────────────────────┐
 │   React (Vite)   │─────▶│  Express API      │─────▶│   LangGraph Agent     │
@@ -82,150 +78,77 @@ InvestSense uses a **LangGraph.js** directed graph to orchestrate multi-dimensio
 ```
 
 ### The 4 Research Signals
+1. **Financial Health**: Analyzes revenue growth, margins, debt levels, and P/E ratio using Alpha Vantage API data.
+2. **News & Sentiment**: Reviews the last 30–60 days of news and sentiment via Tavily Search API.
+3. **Competitive Position**: Leverages LLM reasoning over the context of main competitors and market share trends.
+4. **Management Commentary**: Focuses on CEO statements, guidance, and strategic direction through management-filtered Tavily searches.
 
-| # | Signal | What It Analyzes | Data Source |
-|---|--------|------------------|-------------|
-| 1 | **Financial Health** | Revenue growth trend, margins, debt levels, P/E ratio | Alpha Vantage API |
-| 2 | **News & Sentiment** | Last 30–60 days of news, sentiment analysis | Tavily Search API |
-| 3 | **Competitive Position** | Main competitors, market share trends | LLM reasoning over context |
-| 4 | **Management Commentary** | CEO statements, guidance, strategic direction | Tavily (management-filtered) |
-
-### How the Verdict Works
-
-Each signal node uses **Gemini 2.0 Flash** with **structured output** (Zod schemas) to produce a `SignalResult`:
-
-```json
-{
-  "signalName": "Financial Health",
-  "summary": "Apple shows strong financial health...",
-  "verdict": "positive",
-  "evidence": ["Revenue grew 5.3% YoY", "Profit margin at 26%"]
-}
-```
-
-The **synthesis node** then receives all four structured signals and produces the final verdict — not by averaging scores, but by reasoning over the evidence holistically, like a real analyst would:
-
-```json
-{
-  "decision": "Invest",
-  "confidence": 82,
-  "reasoning": ["Strong and improving financial metrics...", "..."],
-  "risks": ["High valuation relative to growth...", "..."]
-}
-```
+The **synthesis node** receives all four structured signals and produces the final verdict by reasoning over the evidence holistically, mimicking a human analyst.
 
 ---
 
-## Key Decisions & Trade-offs
+## Key decisions & trade-offs
 
 ### Why LLM-synthesized judgment instead of a weighted score?
-
-A hardcoded weighted average (e.g., 40% financials + 30% news + ...) would be easy to implement but impossible to defend. It ignores context — a 70% financial score means very different things for a mature utility company vs. a high-growth tech startup. By having the LLM synthesize across all signals with full context, the reasoning is more nuanced and mirrors how a real analyst forms a judgment.
+A hardcoded weighted average (e.g., 40% financials + 30% news) ignores context — a 70% financial score means very different things for a mature utility company vs. a high-growth tech startup. Having the LLM synthesize across all signals with full context ensures the reasoning is more nuanced.
 
 ### Why these 4 specific signals?
-
 They cover the minimum viable set of dimensions an analyst considers: **trailing performance** (financials), **near-term catalysts** (news), **relative positioning** (competition), and **forward intent** (management). More signals (e.g., technical analysis, ESG scores) would add value but were scoped out for the 7-day timeline.
 
 ### Why Gemini over GPT-4 / Claude?
-
-Gemini offers a generous free tier, which is critical for development — the graph fires 5+ LLM calls per run (4 signal nodes + synthesis), and during testing you'll run dozens of companies. At paid pricing, this would cost significantly more with GPT-4. Gemini's structured output support via LangChain is solid enough for this use case.
+Gemini offers a generous free tier, which is critical for development — the graph fires 5+ LLM calls per run. At paid pricing, testing dozens of companies would cost significantly more with GPT-4. Gemini's structured output support via LangChain is solid enough for this usecase.
 
 ### Why LangGraph instead of a simple chain?
-
-A sequential `chain.pipe(chain).pipe(chain)` would work but doesn't model the real problem. Signal analysis is inherently parallel — news sentiment doesn't depend on financial data. LangGraph's directed graph lets the 4 signal nodes fan out after data fetching and fan in before synthesis, which is both faster and architecturally honest about the problem's dependency structure.
+Signal analysis is inherently parallel — news sentiment doesn't depend on financial data. LangGraph's directed graph lets the 4 signal nodes fan out after data fetching and fan in before synthesis, which is both faster and architecturally honest about the problem's dependency structure.
 
 ### Why a separate Express server instead of Next.js API routes?
-
-The assignment specified React or Next.js for the frontend and Node.js for the backend. Using a separate Express server keeps the concerns clean (the agent can be tested and deployed independently), avoids coupling the AI orchestration to a specific frontend framework, and is more representative of a production architecture.
-
----
-
-## Tech Stack
-
-| Layer | Technology | Why |
-|-------|-----------|-----|
-| Frontend | React (Vite) + Tailwind CSS | Assignment requirement; Vite for fast DX |
-| Backend | Node.js + Express | Assignment requirement; clean separation |
-| AI Orchestration | LangGraph.js | Directed graph for parallel signal analysis |
-| LLM Provider | Google Gemini 2.0 Flash | Free tier, structured output, fast |
-| Financial Data | Alpha Vantage (free) | Company fundamentals + income statements |
-| News Search | Tavily API (free) | LLM-agent-friendly search results |
-| Schema Validation | Zod | Runtime type safety for LLM outputs |
+Using a separate Express server keeps the concerns clean (the agent can be tested and deployed independently), avoids coupling the AI orchestration to a specific frontend framework, and is more representative of a production architecture.
 
 ---
 
-## What I'd Improve With More Time
+## Example runs
 
-- **Streaming progress** — Stream individual node completions to the frontend via SSE/WebSocket so users see real-time progress instead of a simulated loading animation
-- **Caching** — Cache research results per company for the session to avoid hitting API rate limits on repeated queries
-- **Backtesting** — Run the agent against historical company data with known outcomes to validate the quality of its judgments
-- **Side-by-side comparison** — Let users compare two companies' research reports side by side
-- **Richer data sources** — Integrate SEC filings (EDGAR API), analyst estimates, and technical indicators for more comprehensive analysis
-- **Paid API tiers** — Move from free-tier APIs to production-grade plans to eliminate rate limiting as a constraint
-- **Session memory** — Store previous research results and let the synthesis node factor in how a company's signals have changed over time
+*Note: During testing, Alpha Vantage free-tier financial data was unavailable. The agent gracefully degraded, producing verdicts based on the remaining 3 signals.*
 
----
+### 1. Apple Inc (AAPL)
+- **Decision:** Watch (75% confidence)
+- **Signals:** Financials (Neutral/Missing), News (Positive), Competition (Positive), Management (Neutral)
+- **Reasoning Snippet:** While recent earnings were strong, these gains are offset by severe supply chain cost pressures. Strategic long-term moves like the Broadcom chip deal demonstrate continued ecosystem strength. A lack of financial data necessitates a cautious 'Watch' stance.
 
-## Project Structure
+### 2. Infosys (INFY)
+- **Decision:** Watch (75% confidence)
+- **Signals:** Financials (Neutral/Missing), News (Positive), Competition (Neutral), Management (Positive)
+- **Reasoning Snippet:** Qualitative indicators show strong resilience compared to peers. Active investments in generative AI (like Topaz) are strategically sound but present short-term headwinds to operating margins.
 
-```
-investsense-agent/
-├── client/                    # React frontend (Vite + Tailwind)
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── SearchInput.jsx     # Company search form
-│   │   │   ├── LoadingState.jsx    # Animated research progress
-│   │   │   ├── ResultsView.jsx     # Full results display
-│   │   │   ├── SignalCard.jsx      # Expandable signal cards
-│   │   │   └── VerdictBadge.jsx    # Verdict + confidence ring
-│   │   ├── api.js                  # API client
-│   │   ├── App.jsx                 # Root component
-│   │   └── index.css               # Design system
-│   └── ...
-├── server/                    # Express API + LangGraph agent
-│   ├── lib/
-│   │   ├── agent/
-│   │   │   ├── graph.js            # LangGraph wiring
-│   │   │   ├── llm.js             # Gemini wrapper + retry
-│   │   │   ├── nodes.js           # 4 signal nodes + data fetch
-│   │   │   ├── schemas.js         # Zod schemas
-│   │   │   ├── state.js           # AgentState definition
-│   │   │   └── synthesis.js       # Synthesis node
-│   │   ├── dataSources/
-│   │   │   ├── financials.js      # Alpha Vantage integration
-│   │   │   └── news.js            # Tavily integration
-│   │   └── routes/
-│   │       └── research.js        # POST /api/research handler
-│   ├── tests/                     # 81 unit tests
-│   └── ...
-└── docs/                      # PRD and documentation
-```
+### 3. Tesla Inc (TSLA)
+- **Decision:** Watch (75% confidence)
+- **Signals:** Financials (Neutral/Missing), News (Positive), Competition (Neutral), Management (Positive)
+- **Reasoning Snippet:** Operational performance remains strong (25% YoY increase in Q2 vehicle deliveries), but Tesla faces intensifying competition from Chinese rivals like BYD. Its premium valuation is heavily reliant on future execution in AI, FSD, and robotaxi initiatives.
+
+### 4. Zephyr Biotech Solutions (Fictional — failure path test)
+- **Decision:** Watch (85% confidence)
+- **Signals:** Financials (Neutral/Missing), News (Neutral), Competition (Positive - Hallucinated), Management (Neutral)
+- **Observation:** The competition node hallucinated a plausible competitive analysis for this fictional company. This highlights the importance of the disclaimer, as the synthesis node relied on this fabricated signal to boost confidence, while the news node correctly returned neutral with no coverage found.
 
 ---
 
-## Ambiguity Resolutions
+## What you would improve with more time
 
-These are deliberate choices made where the assignment brief was ambiguous:
-
-1. **"Research"** — Scoped to 4 concrete signals (financials + news + competition + management) rather than attempting exhaustive coverage. This is documented in the PRD.
-2. **"Invest or Pass"** — Added a third **Watch** state for genuinely mixed signals, because forcing a binary decision when data is insufficient would be misleading. This is a deliberate deviation noted here.
-3. **Company coverage** — Targets public listed companies (US primarily via Alpha Vantage). Private/unlisted companies fall back to a lighter, news-only research path with reduced confidence.
+- **Streaming progress:** Stream individual node completions to the frontend via SSE/WebSocket so users see real-time progress.
+- **Caching:** Cache research results per company to avoid hitting API rate limits on repeated queries.
+- **Backtesting:** Run the agent against historical company data with known outcomes to validate the quality of its judgments.
+- **Side-by-side comparison:** Let users compare two companies' research reports side by side.
+- **Richer data sources:** Integrate SEC filings (EDGAR API), analyst estimates, and technical indicators for a comprehensive analysis.
+- **Paid API tiers:** Move from free-tier APIs to production-grade plans to eliminate rate limiting.
+- **Session memory:** Store previous research results and let the synthesis node factor in how a company's signals have changed over time.
 
 ---
 
-## Running Tests
+## BONUS: LLM chat session transcripts
 
-```bash
-cd server
-npm test
-```
+The full history of interactions between the developer and the AI agent (Gemini/Claude) during the creation of InvestSense can be found here:
 
-All 81 tests pass, covering:
-- Financial data fetching and normalization (22 tests)
-- News data fetching and normalization (14 tests)
-- Zod schema validation (11 tests)
-- Signal node logic with mocked LLM (9 tests)
-- LLM helper with retry logic (10 tests)
-- Synthesis node (4 tests)
-- API route handler (5 tests)
-- End-to-end graph execution (6 tests)
+- [Development Session Logs](docs/chat-logs/development_session.md)
+- [Example Runs Outputs](docs/example-runs.md)
+
+These logs highlight the TDD approach taken, starting from a Vite + Express scaffold, building out LangGraph nodes in parallel, addressing API rate limit gracefully, and handling AI hallucinations during the testing phases.
